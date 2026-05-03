@@ -27,7 +27,7 @@ pub async fn multi_download(
     filename: &str,
     total_size: u64,
     expected_sha256: &str,
-    peers: Vec<(String, u16)>, // (ip, port)
+    peers: Vec<(String, u16)>,
     dest_dir: &Path,
 ) -> Result<()> {
     if peers.is_empty() {
@@ -67,7 +67,7 @@ pub async fn multi_download(
             let _ = tx.send(result).await;
         });
     }
-    drop(tx); // fermer le canal côté émetteur
+    drop(tx);
 
     // Collecter les résultats
     let mut chunks_data: Vec<Option<Vec<u8>>> = vec![None; total_chunks];
@@ -79,14 +79,16 @@ pub async fn multi_download(
                 chunks_data[cr.index] = Some(cr.data);
             }
             Err(e) => {
-                eprintln!("❌ Erreur chunk : {e}");
+                eprintln!("Erreur chunk : {e}");
                 errors += 1;
             }
         }
     }
 
     if errors > 0 {
-        return Err(anyhow!("{errors} chunk(s) ont échoué — téléchargement incomplet"));
+        return Err(anyhow!(
+            "{errors} chunk(s) ont échoué — téléchargement incomplet"
+        ));
     }
 
     // Réassembler dans l'ordre
@@ -104,9 +106,9 @@ pub async fn multi_download(
     // Vérification SHA-256 finale
     let actual = hex::encode(hasher.finalize());
     if actual == expected_sha256 {
-        println!("✅ Fichier réassemblé et intégrité vérifiée : {filename}");
+        println!("Fichier réassemblé et intégrité vérifiée : {filename}");
     } else {
-        eprintln!("⚠️  Hash incorrect — fichier corrompu");
+        eprintln!(" Hash incorrect — fichier corrompu");
         eprintln!("   Attendu : {expected_sha256}");
         eprintln!("   Reçu    : {actual}");
     }
@@ -114,12 +116,12 @@ pub async fn multi_download(
     Ok(())
 }
 
-/// Télécharger un chunk depuis un pair
+//Peremt de télécharger un chunk depuis un pair
 async fn download_chunk(task: &ChunkTask, pb: ProgressBar) -> Result<ChunkResult> {
     let addr = format!("{}:{}", task.peer_ip, task.peer_port);
     let mut stream = TcpStream::connect(&addr).await?;
 
-    // Envoyer GET avec offset
+    //Permet d'envoyer GET avec offset
     let req = TcpRequest::Get {
         filename: task.filename.clone(),
         offset: task.offset,
@@ -129,7 +131,7 @@ async fn download_chunk(task: &ChunkTask, pb: ProgressBar) -> Result<ChunkResult
     stream.write_all(json.as_bytes()).await?;
     stream.flush().await?;
 
-    // Lire la réponse métadonnées
+    //Peremt de lire la réponse métadonnées
     let (reader_half, _) = stream.split();
     let mut reader = BufReader::new(reader_half);
     let mut line = String::new();
@@ -143,7 +145,7 @@ async fn download_chunk(task: &ChunkTask, pb: ProgressBar) -> Result<ChunkResult
         other => return Err(anyhow!("Réponse inattendue : {:?}", other)),
     }
 
-    // Lire exactement `length` octets
+    // permet de lire exactement `length` octets
     let mut data = Vec::with_capacity(task.length as usize);
     let mut buf = vec![0u8; 65536];
     let mut remaining = task.length;
@@ -166,7 +168,7 @@ async fn download_chunk(task: &ChunkTask, pb: ProgressBar) -> Result<ChunkResult
     })
 }
 
-/// Créer la liste des chunks répartis entre les pairs
+// Permet de créer la liste des chunks répartis entre les pairs
 fn make_chunks(filename: &str, total_size: u64, peers: &[(String, u16)]) -> Vec<ChunkTask> {
     let mut tasks = Vec::new();
     let mut offset = 0u64;
