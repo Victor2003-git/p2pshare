@@ -1,4 +1,8 @@
-
+// ============================================================
+// P2PShare — README
+// Auteur    : LEONEL MAXIME NGUENE — 22G00348
+// Encadrant : Dr MIMBEU — ENSPD 2025-2026
+// =============================================================
 # P2PShare — Partage de fichiers pair-à-pair en réseau local
 
 Application Rust de partage de fichiers en LAN, sans serveur central.  
