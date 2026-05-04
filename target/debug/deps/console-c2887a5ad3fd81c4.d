@@ -1,0 +1,11 @@
+C:\Users\SMART\Desktop\RUST\p2pshare\target\debug\deps\console-c2887a5ad3fd81c4.d: C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\lib.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\common_term.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\kb.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\term.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\utils.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\windows_term\mod.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\ansi.rs
+
+C:\Users\SMART\Desktop\RUST\p2pshare\target\debug\deps\libconsole-c2887a5ad3fd81c4.rmeta: C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\lib.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\common_term.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\kb.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\term.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\utils.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\windows_term\mod.rs C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\ansi.rs
+
+C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\lib.rs:
+C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\common_term.rs:
+C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\kb.rs:
+C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\term.rs:
+C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\utils.rs:
+C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\windows_term\mod.rs:
+C:\Users\SMART\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\console-0.15.11\src\ansi.rs:
