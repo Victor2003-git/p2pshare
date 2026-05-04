@@ -6,8 +6,8 @@
 // Ce module orchestre trois services en parallèle :
 //   1. discovery : annonces UDP multicast toutes les 5s
 //   2. server    : serveur TCP de transfert de fichiers
-//   3. cli       : interface interactive REPL (Read-Eval-Print)
-// ============================================================
+//   3. cli       : interface interactive REPL
+// =============================================================
 mod discovery;
 mod server;
 mod client;
