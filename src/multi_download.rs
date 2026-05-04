@@ -1,8 +1,3 @@
-// Partie 4 — Téléchargement multi-sources
-//
-// Divise un fichier en chunks et les télécharge en parallèle depuis plusieurs pairs.
-// Réassemble dans l'ordre et vérifie l'intégrité finale SHA-256.
-
 use crate::protocol::{ChunkTask, TcpRequest, TcpResponse};
 use crate::shared_state::SharedState;
 use anyhow::{anyhow, Result};
@@ -13,28 +8,25 @@ use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
 use tokio::sync::mpsc;
 
-const CHUNK_SIZE: u64 = 2 * 1024 * 1024; // 2 Mo par chunk
+const CHUNK_SIZE: u64 = 2 * 1024 * 1024;
 
-/// Résultat d'un chunk téléchargé
 struct ChunkResult {
     index: usize,
     data: Vec<u8>,
 }
 
-/// Télécharger un fichier depuis plusieurs pairs en parallèle
 pub async fn multi_download(
     state: &SharedState,
     filename: &str,
     total_size: u64,
     expected_sha256: &str,
-    peers: Vec<(String, u16)>, // (ip, port)
+    peers: Vec<(String, u16)>,
     dest_dir: &Path,
 ) -> Result<()> {
     if peers.is_empty() {
         return Err(anyhow!("Aucun pair disponible pour le téléchargement"));
     }
 
-    // Diviser en chunks
     let chunks = make_chunks(filename, total_size, &peers);
     let total_chunks = chunks.len();
     println!(
@@ -44,7 +36,6 @@ pub async fn multi_download(
         peers.len()
     );
 
-    // Multi-progress
     let mp = MultiProgress::new();
     let style = ProgressStyle::with_template(
         "{spinner:.blue} [{bar:30.cyan/blue}] {bytes}/{total_bytes} — {msg}",
@@ -52,10 +43,8 @@ pub async fn multi_download(
     .unwrap()
     .progress_chars("=>-");
 
-    // Canal pour collecter les résultats
     let (tx, mut rx) = mpsc::channel::<Result<ChunkResult>>(total_chunks);
 
-    // Spawner un worker par chunk
     for task in chunks {
         let tx = tx.clone();
         let pb = mp.add(ProgressBar::new(task.length));
@@ -67,9 +56,8 @@ pub async fn multi_download(
             let _ = tx.send(result).await;
         });
     }
-    drop(tx); // fermer le canal côté émetteur
+    drop(tx);
 
-    // Collecter les résultats
     let mut chunks_data: Vec<Option<Vec<u8>>> = vec![None; total_chunks];
     let mut errors = 0;
 
@@ -79,17 +67,18 @@ pub async fn multi_download(
                 chunks_data[cr.index] = Some(cr.data);
             }
             Err(e) => {
-                eprintln!("❌ Erreur chunk : {e}");
+                eprintln!("Erreur chunk : {e}");
                 errors += 1;
             }
         }
     }
 
     if errors > 0 {
-        return Err(anyhow!("{errors} chunk(s) ont échoué — téléchargement incomplet"));
+        return Err(anyhow!(
+            "{errors} chunk(s) ont échoué — téléchargement incomplet"
+        ));
     }
 
-    // Réassembler dans l'ordre
     let dest_path = dest_dir.join(filename);
     let mut file = tokio::fs::File::create(&dest_path).await?;
     let mut hasher = Sha256::new();
@@ -101,25 +90,24 @@ pub async fn multi_download(
     }
     file.flush().await?;
 
-    // Vérification SHA-256 finale
     let actual = hex::encode(hasher.finalize());
     if actual == expected_sha256 {
-        println!("✅ Fichier réassemblé et intégrité vérifiée : {filename}");
+        println!("Fichier réassemblé et intégrité vérifiée : {filename}");
     } else {
-        eprintln!("⚠️  Hash incorrect — fichier corrompu");
-        eprintln!("   Attendu : {expected_sha256}");
-        eprintln!("   Reçu    : {actual}");
+        eprintln!(" Hash incorrect — fichier corrompu");
+        eprintln!(" Attendu : {expected_sha256}");
+        eprintln!(" Reçu    : {actual}");
     }
 
     Ok(())
 }
 
-/// Télécharger un chunk depuis un pair
+/*permet de se connecter à un pair, envoyer une requête de téléchargement pour un
+chunk spécifique, et recevoir les données du chunk en gérant la progression*/
 async fn download_chunk(task: &ChunkTask, pb: ProgressBar) -> Result<ChunkResult> {
     let addr = format!("{}:{}", task.peer_ip, task.peer_port);
     let mut stream = TcpStream::connect(&addr).await?;
 
-    // Envoyer GET avec offset
     let req = TcpRequest::Get {
         filename: task.filename.clone(),
         offset: task.offset,
@@ -129,7 +117,6 @@ async fn download_chunk(task: &ChunkTask, pb: ProgressBar) -> Result<ChunkResult
     stream.write_all(json.as_bytes()).await?;
     stream.flush().await?;
 
-    // Lire la réponse métadonnées
     let (reader_half, _) = stream.split();
     let mut reader = BufReader::new(reader_half);
     let mut line = String::new();
@@ -143,7 +130,6 @@ async fn download_chunk(task: &ChunkTask, pb: ProgressBar) -> Result<ChunkResult
         other => return Err(anyhow!("Réponse inattendue : {:?}", other)),
     }
 
-    // Lire exactement `length` octets
     let mut data = Vec::with_capacity(task.length as usize);
     let mut buf = vec![0u8; 65536];
     let mut remaining = task.length;
@@ -166,7 +152,7 @@ async fn download_chunk(task: &ChunkTask, pb: ProgressBar) -> Result<ChunkResult
     })
 }
 
-/// Créer la liste des chunks répartis entre les pairs
+//permet de découper un fichier en chunks et d'assigner chaque chunk à un pair différent pour le téléchargement parallèle
 fn make_chunks(filename: &str, total_size: u64, peers: &[(String, u16)]) -> Vec<ChunkTask> {
     let mut tasks = Vec::new();
     let mut offset = 0u64;
