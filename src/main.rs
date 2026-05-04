@@ -1,3 +1,13 @@
+// ============================================================
+// P2PShare — Point d'entrée principal
+// Auteur    : NZIE NZOUANGO MARC VICTOR — 22G00348
+// Encadrant : Dr MIMBEU — ENSPD 2025-2026
+// ------------------------------------------------------------
+// Ce module orchestre trois services en parallèle :
+//   1. discovery : annonces UDP multicast toutes les 5s
+//   2. server    : serveur TCP de transfert de fichiers
+//   3. cli       : interface interactive REPL (Read-Eval-Print)
+// ============================================================
 mod discovery;
 mod server;
 mod client;
