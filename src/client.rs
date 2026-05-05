@@ -1,4 +1,4 @@
-// Partie 3 — Client de téléchargement TCP
+// Partie 3 — Clients de téléchargement TCP
 //
 // • Connexion à un pair
 // • LIST  → liste ses fichiers
@@ -54,7 +54,7 @@ pub async fn download_file(
     )
     .await?;
 
-    // Lire la réponse métadonnées
+    // Lire la réponse des métadonnées
     let (reader, writer) = conn.split();
     let mut reader = BufReader::new(reader);
     let _ = writer; // pas d'envoi supplémentaire
@@ -70,7 +70,7 @@ pub async fn download_file(
         other => return Err(anyhow!("Réponse inattendue : {:?}", other)),
     };
 
-    // Barre de progression
+    // Barre de progressions
     let pb = ProgressBar::new(total_size);
     pb.set_style(
         ProgressStyle::with_template(
